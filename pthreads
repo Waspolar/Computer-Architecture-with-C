@@ -1,0 +1,214 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <pthread.h>
+#define n 100000000
+#define NUM_THREADS 5
+#include <unistd.h>
+
+
+//global var
+  int array[n];
+  int max;
+  int min;
+
+//The first quartile thread
+void * run1(void * arg){
+  int min2 = array[0];
+int max2 = array[0];
+for (int i = 0; i<25000000; i++){
+
+if (array[i] > max2){
+  max2 = array[i];
+}
+
+
+if (array[i] < min2 ){
+  min2 = array[i];
+}
+}
+printf("The min for the first quarter is %d and the max is %d\n", min2, max2);
+  //Setting up the global values to have something to compare with unrealistically
+   max = 1;
+   min = 999999999;
+  if(max<max2){
+    max = max2;
+  }
+  if(min>min2){
+    min = min2;
+  }
+      pthread_exit(NULL);
+
+}
+//the second quartile thread
+void * run2(void * arg){
+    int min2 = array[25000000];
+int max2 = array[25000000];
+  sleep(1);
+for (int i = 25000000; i<50000000; i++){
+
+if (array[i] < min2 ){
+  min2 = array[i];
+}
+if (array[i] > max2){
+  max2 = array[i];
+}
+
+}
+printf("The min for second quarter is %d and the max is %d\n", min2, max2);
+  if(max<max2){
+    max = max2;
+
+  }
+  if(min>min2){
+min = min2;
+  }
+      pthread_exit(NULL);
+}
+//the third quartile thread
+void * run3(void * arg){
+   int min2 = array[50000000];
+int max2 = array[50000000];
+  sleep(1);
+for (int i = 50000000; i<75000000; i++){
+
+if (array[i] < min2 ){
+  min2 = array[i];
+}
+if (array[i] > max2){
+  max2 = array[i];
+}
+
+}
+printf("The min for the third quarter is %d and the max is %d\n", min2, max2);
+  if(max<max2){
+    max = max2;
+
+  }
+  if(min>min2){
+min = min2;
+  }
+      pthread_exit(NULL);
+}
+//the fourth quartile thread
+void * run4(void * arg){
+   int min2 = array[75000000];
+int max2 = array[75000000];
+  sleep(1);
+for (int i = 75000000; i<100000000; i++){
+
+if (array[i] < min2 ){
+  min2 = array[i];
+}
+if (array[i] > max2){
+  max2 = array[i];
+}
+
+}
+printf("The min for fourth quarter is %d and the max is %d\n", min2, max2);
+  if(max<max2){
+    max = max2;
+
+  }
+  if(min>min2){
+min = min2;
+  }
+      pthread_exit(NULL);
+}
+
+
+//ONE THREAD RUNNING
+
+void * run(void * arg){
+int min2 = array[0];
+int max2 = array[0];
+sleep(1);
+for (int i = 0; i<100000000; i++){
+
+if (array[i] < min2 ){
+  min2 = array[i];
+}
+if (array[i] > max2){
+  max2 = array[i];
+}
+
+}
+
+  if(max<max2){
+    max = max2;
+  }
+  if(min>min2){
+    min = min2;
+  }
+      pthread_exit(NULL);
+
+}
+
+
+//MAIN---------------------------------------------------------
+int main(){
+
+  srand( (int) time(NULL) );
+  clock_t start;
+  clock_t end;
+  int timeSpent;
+  clock_t startForFour;
+  clock_t endForFour;
+  int timeSpentForFour;
+
+ //init threads
+  pthread_t thr1, thr2, thr3, thr4;
+
+  pthread_t thr5;
+
+
+
+
+
+//fill array
+  for (int i=0; i<100000000; i++){
+    array[i] = rand();
+   // printf("%d\n", array[i]);
+
+ }
+//start execution time
+  
+  //The 4 threads that will run together
+    startForFour = clock();
+
+  
+  pthread_create(&thr1, NULL, run1, NULL);
+  pthread_create(&thr2, NULL, run2, NULL);
+  pthread_create(&thr3, NULL, run3, NULL);
+  pthread_create(&thr4, NULL, run4, NULL);
+
+  pthread_join(thr1, NULL);
+  pthread_join(thr2, NULL);
+  pthread_join(thr3, NULL);
+  pthread_join(thr4, NULL);
+  
+    endForFour = clock();
+
+ printf("For the four threads that will be running the GLOBAL MIN is %d and the GLOBAL MAX is %d. Also the elapse time for four threads running is %d\n", min, max, timeSpentForFour);
+  
+//the thread that will run alone
+  start = clock();
+
+  
+  pthread_create(&thr5, NULL, run, NULL);
+
+  pthread_join(thr5, NULL);
+
+
+end = clock();
+
+timeSpent = end - start;
+  timeSpentForFour = endForFour - startForFour;
+     // printf("is the time spent %d\n", timeSpent);
+
+      printf("For a single thread the MIN is %d and the MAX is %d. Also the elapse time for one thread running is %d\n", min, max, timeSpent);
+  exit(0);
+ }
+  
+      
+
